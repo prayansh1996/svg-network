@@ -5,10 +5,11 @@ import re
 import shutil
 import pickle
 
-makeSVGs = True
-moveSVGs = True
+makeSVGs = False
+moveSVGs = False
 extractd = True
-
+regex = True
+saveFonts = True
 
 fontNames = set()
 if makeSVGs:
@@ -27,13 +28,14 @@ if moveSVGs:
         if not fontNames.__contains__(f):
             shutil.move(os.path.join('./fonts',f), pathForSVGs)
 
+#-----------------------------------------------------------------------#
+
 class Fonts:
     def __init__(self, name, d):
         self.name = name
         self.d = d
 
 fontList = []
-
 if extractd:
     files = os.listdir('./svg')
     for f in files:
@@ -45,5 +47,23 @@ if extractd:
             fontList.append(Fonts(f,d))
         except:
             print("Cannot parse: ", f)
-        print ""
 
+if regex:
+    for font in fontList:
+        font.d = re.findall("[a-zA-Z][^a-zA-Z]*", font.d)
+        strokes = []
+        for stroke in font.d:
+            command = stroke[:1]
+            parameters = stroke[1:]
+            parameters = parameters.split()
+            parameters = [float(i) for i in parameters]
+            strokes.append([command,parameters])
+        font.d = strokes
+        
+#-----------------------------------------------------------------------#
+
+if saveFonts:
+    data = open("savedFonts", 'w')
+    pickle.dump(fontList, data)
+        
+# print fontList[0].d[0][1][0] + fontList[0].d[0][1][1]
