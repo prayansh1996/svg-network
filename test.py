@@ -8,4 +8,5 @@ class Fonts:
 f = open("savedFonts", 'r')
 l = pickle.load(f)
 
-print l[0].d
+for font in l:
+    print font.name, ":", font.d, "\n\n\n"
